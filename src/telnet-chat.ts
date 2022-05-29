@@ -1,39 +1,39 @@
-const net=require('net');
-var clients=[];
-var createClient=function(socket){
-    var buffer="";
-    var state="login";
-    var username="";
-    var writePrompt=function(hideNewline){
+import net from "net";
+let clients=[];
+function createClient(socket){
+    let buffer="";
+    let state="login";
+    let username="";
+    function writePrompt(hideNewline){
         if(hideNewline){
             socket.write(username+"> ");
         }else{
             socket.write("\r\n"+username+"> ");
         }
     };
-    var execute=function(){
+    function execute(){
         if (state==="login"){
             username=buffer;
             state="normal";
             socket.write("\r\nWelcome "+username);
             socket.write("\r\nThere are "+(clients.length-1)+" other users present.");
             socket.write("\r\n------------");
-            writePrompt();
+            writePrompt(false);
         }else{
-            broadcast(username+"> "+buffer,socket);
+            broadcast(username+"> "+buffer);
             writePrompt(true);
         }
         buffer="";
     };
-    var send=function(message){
+    function send(message){
         socket.write("\b\b  \b\b");
         for(var i=0;i<username.length;i++){
             socket.write("\b \b\b");
         }
         socket.write(message);
-        writePrompt();
+        writePrompt(false);
     };
-    var broadcast=function(message){
+    function broadcast(message){
         clients.forEach(function(client){
             if(client.socket===socket) return;
             client.send(message);
@@ -41,14 +41,14 @@ var createClient=function(socket){
     };
     socket.on("data",function(data){
         buffer+=data.toString();
-        var index=buffer.indexOf("\r\n");
+        let index=buffer.indexOf("\r\n");
         if(index!==-1&&index===buffer.length-2){
             buffer=buffer.slice(0,-2);
             execute();
         }
     });
     socket.on('end',function(){
-        var i=clients.indexOf(socket);
+        let i=clients.indexOf(socket);
         clients.splice(i,1);
     });
     socket.write("\r\nWhat is your username: ");
@@ -60,4 +60,6 @@ var createClient=function(socket){
 };
 net.createServer(function(socket){
     clients.push(createClient(socket));
-}).listen(8000);
+}).listen(2344, ()=>{
+    console.log("\033[1;32m[OK]\033[0m telnet-chat online");
+});
