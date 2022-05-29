@@ -1,10 +1,10 @@
 import net from "net";
 let clients=[];
-function createClient(socket){
+function createClient(socket: net.Socket){
     let buffer="";
     let state="login";
     let username="";
-    function writePrompt(hideNewline){
+    function writePrompt(hideNewline: boolean){
         if(hideNewline){
             socket.write(username+"> ");
         }else{
@@ -25,7 +25,7 @@ function createClient(socket){
         }
         buffer="";
     };
-    function send(message){
+    function send(message: string){
         socket.write("\b\b  \b\b");
         for(var i=0;i<username.length;i++){
             socket.write("\b \b\b");
@@ -33,13 +33,13 @@ function createClient(socket){
         socket.write(message);
         writePrompt(false);
     };
-    function broadcast(message){
+    function broadcast(message: string){
         clients.forEach(function(client){
             if(client.socket===socket) return;
             client.send(message);
         });
     };
-    socket.on("data",function(data){
+    socket.on("data", (data)=>{
         buffer+=data.toString();
         let index=buffer.indexOf("\r\n");
         if(index!==-1&&index===buffer.length-2){
@@ -47,7 +47,7 @@ function createClient(socket){
             execute();
         }
     });
-    socket.on('end',function(){
+    socket.on('end',()=>{
         let i=clients.indexOf(socket);
         clients.splice(i,1);
     });
@@ -60,6 +60,4 @@ function createClient(socket){
 };
 net.createServer(function(socket){
     clients.push(createClient(socket));
-}).listen(2344, ()=>{
-    console.log("\033[1;32m[OK]\033[0m telnet-chat online");
-});
+}).listen(2344);

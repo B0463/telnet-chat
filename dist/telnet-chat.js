@@ -50,7 +50,7 @@ function createClient(socket) {
         });
     }
     ;
-    socket.on("data", function (data) {
+    socket.on("data", (data) => {
         buffer += data.toString();
         let index = buffer.indexOf("\r\n");
         if (index !== -1 && index === buffer.length - 2) {
@@ -58,7 +58,7 @@ function createClient(socket) {
             execute();
         }
     });
-    socket.on('end', function () {
+    socket.on('end', () => {
         let i = clients.indexOf(socket);
         clients.splice(i, 1);
     });
