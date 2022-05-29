@@ -1,5 +1,6 @@
 cd ..
 rm -r src
+rm -r .git
 rm .gitignore
 rm package-lock.json
 rm package.json
